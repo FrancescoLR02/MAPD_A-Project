@@ -100,10 +100,11 @@ void setup() {
   for (int command = 0; command < 15; command += 1) {
       setLine(data[command]); //set the RAM data/instruction
       
+      int tempCommand = command;
       //set the RAM address using arduino pins from 9 (LSB) to 12 (MSB)
       for (int pin = 9; pin <= 12; pin += 1) {
-        digitalWrite(pin, command & 1); //MAYBE WE NEED TO CONVERT INT INTO BYTE
-      command = command >> 1;
+        digitalWrite(pin, tempCommand & 1); //MAYBE WE NEED TO CONVERT INT INTO BYTE
+      tempCommand = tempCommand >> 1;
       }
 
       //to click the write button of the RAM
