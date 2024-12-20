@@ -43,7 +43,7 @@ for (int pin = 5; pin <= 8; pin += 1) {
 
 //---------------------------------------------------------------------------------------------
 
-byte data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+//byte data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 //questo contiene solo l'istruzione, quella che sopra è chiamata MN, l'informazione dell'address della RAM e' già contenuta nella posizione in cui si trova nell'array l'istruzione (e.g. posizione 0 corrisponde all'addressRAM=0, posizione 15 è l'addressRAM=15 -i.e. l'ultimo-)
 
 //---------------------------------------------------------------------------------------------
@@ -87,12 +87,12 @@ byte getValueForKey(const char* key) {
 //Questa funzione prende in input l'istruzione (LDA, ADD, ...) e il dato (che esso sia l'address del registro o il dato in sè)
 // e sputa fuori un byte che identifica, una volta settato l'address corretto della pcb nella quale mettere l'istruzione, 
 // quello che dobbiamo mettere nel pezzetto a 8 bit (non ricordo come si chiama)
-byte ConvertSAPLine(char *Instr, int Value) {
-
-
-
-
-	return dato_convertito;
+byte ConvertSAPLine(const char *Instr, int Value) {
+  
+  // Combina i 4 bit dell'istruzione con i 4 bit del dato
+  byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111);  // Shift a sinistra di 4 bit + aggiungi i 4 bit del dato
+  
+  return result;  // Ritorna il numero binario a 8 bit
 }
 
 
@@ -145,23 +145,31 @@ void setLine(int Line) {
 //---------------------------------------------------------------------------------------------
 
 void setup() {
+
+  Serial.begin(57600);
+
+  Serial.print(ConvertSAPLine("LDA", 15), BIN);
+
+ /*
   pinMode(SHIFT_DATA, OUTPUT);
   pinMode(SHIFT_CLK, OUTPUT);
   pinMode(SHIFT_LATCH, OUTPUT);
   digitalWrite(WRITE_EN, HIGH); //all'inizio meglio mettere a HIGH il pulsante che schiacciamo per scrivere nella RAM, se guardi nel datasheet dovrebbe funzionare che scrivi quando lo metti a low (perchè è un active low, di quelli negati in partenza)
   pinMode(WRITE_EN, OUTPUT);
-  //Serial.begin(57600);
+  Serial.begin(57600);
 
-for (int command = 0; command < 15; command += 1) {
-    setLine((command << 8) | data[command])
-//ho i miei seri dubbi che funzioni, perché prima dentro data[command] c'era sia l'addressRAM che datoRAM poi mi sono accorto che command non è altro che addressRAM, però setLine lavora con 8+8 bit
-    digitalWrite(WRITE_EN, LOW); //qui è come quando schiacciavamo il pulsante 'write'
-    delayMicroseconds(1000); //sarebbe come tenere premuto il tasto 'write' per 0.1 secondi, questo bisogna sperimentare
-    digitalWrite(WRITE_EN, HIGH);
-    delay(2); //meglio apsettare 2 secondi prima di scrivere la prossima riga del programma, almeno all'inizio sennò crasha tutto
+  */ 
+
+ /*
+  for (int command = 0; command < 15; command += 1) {
+      setLine((command << 8) | data[command])
+  //ho i miei seri dubbi che funzioni, perché prima dentro data[command] c'era sia l'addressRAM che datoRAM poi mi sono accorto che command non è altro che addressRAM, però setLine lavora con 8+8 bit
+      digitalWrite(WRITE_EN, LOW); //qui è come quando schiacciavamo il pulsante 'write'
+      delayMicroseconds(1000); //sarebbe come tenere premuto il tasto 'write' per 0.1 secondi, questo bisogna sperimentare
+      digitalWrite(WRITE_EN, HIGH);
+      delay(2); //meglio apsettare 2 secondi prima di scrivere la prossima riga del programma, almeno all'inizio sennò crasha tutto
   }
-
-
+  */
 
 }
 
