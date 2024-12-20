@@ -111,7 +111,7 @@ occhio che quando hai tipo "LDA 15" devi fare i primi 4 bit << 4 e poi | (or) co
 //---------------------------------------------------------------------------------------------
 
 //This program does 6+10-5 (wooooooooow)
-char data[16] = {
+byte data[16] = {
   data[0] = ConvertSAPLine("LDA", 15),
   data[1] = ConvertSAPLine("ADD", 14),
   data[2] = ConvertSAPLine("SUB", 13),
