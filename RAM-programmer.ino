@@ -1,7 +1,7 @@
- 
-
-
-
+#define SHIFT_DATA 2 //serial data
+#define SHIFT_CLK 3 //è il clock interno dello shift register
+#define SHIFT_LATCH 4 //questo è quello che manda tutti dati contemporanenamente allo store register
+#define WRITE_EN 13 //questo sarà l'equivalente di schiacciare il tasto write 
 
 //---------------------------------------------------------------------------------------------
 
