@@ -53,8 +53,6 @@ byte ConvertSAPLine(const char *Instr, int Value) {
 }
 
 //---------------------------------------------------------------------------------------------
-
-//PROGRAM TO IMPLEMENT
 //This program does 6+10-5
 byte data[16] = {
   data[0] = ConvertSAPLine("LDA", 15),
@@ -107,7 +105,9 @@ void setup() {
       for (int pin = 9; pin <= 12; pin += 1) {
         digitalWrite(pin, tempCommand & 1); //MAYBE WE NEED TO CONVERT INT INTO BYTE
       tempCommand = tempCommand >> 1;
-      }
+
+      //to click the write button of the RAM
+      digitalWrite(WRITE_EN, LOW);
 
       //to click the write button of the RAM
       digitalWrite(WRITE_EN, LOW);
