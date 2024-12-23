@@ -6,7 +6,15 @@
 //---------------------------------------------------------------------------------------------
 
 // Global variable to track if it is needed to write the RAM address
-bool RAMwrite = True;
+bool RAMwrite = true;
+// DA IMPLEMENTARE MEGLIO PERCHE' IN MANIERA GLOBALE DENTRO AL CICLO FOR PRINCIPALE
+// QUELLO DEI COMMANDS, NON FUNZIONEREBBE PERCHE' DEVE AD OGNI ITARAZIONE DIRE SE BISOGNA
+// SCRIVERE O MENO, MENTRE METTENDO I VALORI DELL'ARRAY ALL'INIZIO LI' SUBITO SI CAMBIA
+// IL VALORE DI QUESTA VARIABILE DI FLAG
+
+// forse soluzione è fare un array in cui con questa variabile true o false
+// quando si "scrive" il programma all'inizio si filli un array da 16 caselle
+// in cui si immagazzina di volta in volta true o false a seconda che dopo l'istruzione debba essere scritta o meno
 
 // Struct useful for the dictionary
 struct KeyValue {
@@ -43,24 +51,45 @@ byte getValueForKey(const char* key) {
 byte ConvertSAPLine(const char *Instr = "", int Value = -1) {
   if (Instr != "" && Value != -1) {
       byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
-      RAMwrite = True;
+      RAMwrite = true;
       return result; // Return the 8-bit binary value
   } else {
       if (Value >= 0 && Value <= 255) {
         byte result = Value & 0b11111111;
-        RAMwrite = True;
+        RAMwrite = true;
         return result; // Return the byte directly if within range
       }
       else {
-        RAMwrite = False;
+        RAMwrite = false;
         return 0; // Default return value
       }
   }
-  RAMwrite = False;
+  RAMwrite = false;
   return 0; // Default return value
 }
 
 //---------------------------------------------------------------------------------------------
+
+// Declare and initialize the array data[] (for SAP program) with default values
+/*byte data[16] = {
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1),
+  ConvertSAPLine("", -1)
+};*/
+
 
 // This program performs the calculation 6 + 10 - 5
 byte data[16] = {
@@ -70,7 +99,7 @@ byte data[16] = {
   data[3] = ConvertSAPLine(   "OUT", 0  ), // Output the result
   data[4] = ConvertSAPLine(   "HLT", 0  ), // Halt the program
   data[5]  = ConvertSAPLine(  "NOP", 0  ), // No operation
-  data[6]  = ConvertSAPLine(  ""  , 255 ),// just a test
+  data[6]  = ConvertSAPLine(  ""   , 255 ),// just a test
   data[7]  = ConvertSAPLine(  ""   , -1 ),
   data[8]  = ConvertSAPLine(  ""   , -1 ),
   data[9]  = ConvertSAPLine(  ""   , -1 ),
