@@ -38,13 +38,13 @@ byte getValueForKey(const char* key) {
 
 // Function to combine the instruction's 4 bits with the operand's 4 bits
 // or directly take an 8-bit integer input
-byte ConvertSAPLine(const char *Instr = nullptr, int Value) {
+byte ConvertSAPLine(const char *Instr = nullptr, int Value = 0) {
   if (Instr != nullptr) {
     byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
     return result; // Return the 8-bit binary value
   } 
   else {
-    byte result = Value & 0b11111111
+    byte result = Value & 0b11111111;
     return result;
   }
   return 0; // Default return value
