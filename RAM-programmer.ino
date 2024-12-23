@@ -5,7 +5,8 @@
 
 //---------------------------------------------------------------------------------------------
 
-// Global variable to take track if the instruction need to be write
+// Global variable to track if it is needed to write the RAM address
+bool RAMwrite = True
 
 // Struct useful for the dictionary
 struct KeyValue {
@@ -25,9 +26,7 @@ KeyValue dictionary[16] = {
   {"JC" , 0b0111},
   {"JZ" , 0b1000},
   {"OUT", 0b1110},
-  {"HLT", 0b1111},
-  {""   , 0b1111} // Added to enable the possibility to insert number up to 255
-};
+  {"HLT", 0b1111}};
 
 // Function to find the value corresponding to a mnemonic in the dictionary
 byte getValueForKey(const char* key) {
@@ -41,9 +40,19 @@ byte getValueForKey(const char* key) {
 
 // Function to combine the instruction's 4 bits with the operand's 4 bits
 // or directly take an 8-bit integer input
-byte ConvertSAPLine(const char *Instr = nullptr, int Value = 0) {
-  byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
-  return result; // Return the 8-bit binary value
+byte ConvertSAPLine(const char *Instr = "", int Value = -1) {
+  if (Instr != "" && Value != -1) {
+      byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
+      return result; // Return the 8-bit binary value
+  } else {
+      if (Value >= 0 && Value <= 255) {
+        byte result = Value & 0b11111111;
+        return result; // Return the byte directly if within range
+      }
+      else {
+        return 0; // Default return value
+      }
+  }
   return 0; // Default return value
 }
 
@@ -56,17 +65,17 @@ byte data[16] = {
   data[2] = ConvertSAPLine(   "SUB", 13 ), // Subtract 5 (stored in RAM address 13)
   data[3] = ConvertSAPLine(   "OUT", 0  ), // Output the result
   data[4] = ConvertSAPLine(   "HLT", 0  ), // Halt the program
-  data[5]  = ConvertSAPLine(  "NOP", 0  ), // No operation (remaining instructions are NOPs)
-  data[6]  = ConvertSAPLine(   ""  , 255 ),
-  data[7]  = ConvertSAPLine(  "NOP", 0  ),
-  data[8]  = ConvertSAPLine(  "NOP", 0  ),
-  data[9]  = ConvertSAPLine(  "NOP", 0  ),
-  data[10]  = ConvertSAPLine( "NOP", 0  ),
-  data[11]  = ConvertSAPLine( "NOP", 0  ),
-  data[12]  = ConvertSAPLine( "NOP", 0  ),
-  data[13] = ConvertSAPLine(  "NOP", 5  ),
-  data[14] = ConvertSAPLine(  "NOP", 10 ),
-  data[15] = ConvertSAPLine(  "NOP", 6  ),
+  data[5]  = ConvertSAPLine(  "NOP", 0  ), // No operation
+  data[6]  = ConvertSAPLine(  ""  , 255 ),// just a test
+  data[7]  = ConvertSAPLine(  ""   , -1 ),
+  data[8]  = ConvertSAPLine(  ""   , -1 ),
+  data[9]  = ConvertSAPLine(  ""   , -1 ),
+  data[10]  = ConvertSAPLine( ""   , -1 ),
+  data[11]  = ConvertSAPLine( ""   , -1 ),
+  data[12]  = ConvertSAPLine( ""   , -1 ),
+  data[13] = ConvertSAPLine(  ""   , 5  ),
+  data[14] = ConvertSAPLine(  ""   , 10 ),
+  data[15] = ConvertSAPLine(  ""   , 6  ),
 };
 
 //---------------------------------------------------------------------------------------------
@@ -102,10 +111,11 @@ void setup() {
     }
 
     // Simulate pressing the write button on the RAM
+    delay(500); // Wait for 0.5 second
     digitalWrite(WRITE_EN, LOW);
     delay(250); // Wait for 0.25 second
     digitalWrite(WRITE_EN, HIGH);
-    delay(1000); // Wait for 1 second
+    delay(500); // Wait for 0.5 second
   }
 
   // Set everything to 0 at the end of the cycle
