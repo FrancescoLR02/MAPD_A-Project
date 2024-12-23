@@ -55,22 +55,22 @@ byte ConvertSAPLine(const char *Instr, int Value) {
 //---------------------------------------------------------------------------------------------
 //This program does 6+10-5
 byte data[16] = {
-  data[0] = ConvertSAPLine("LDA", 15),
-  data[1] = ConvertSAPLine("ADD", 14),
-  data[2] = ConvertSAPLine("SUB", 13),
-  data[3] = ConvertSAPLine("OUT", 0),
-  data[4] = ConvertSAPLine("HLT", 0),
-  data[5]  = ConvertSAPLine("NOP", 0),
-  data[6]  = ConvertSAPLine("NOP", 0),
-  data[7]  = ConvertSAPLine("NOP", 0),
-  data[8]  = ConvertSAPLine("NOP", 0),
-  data[9]  = ConvertSAPLine("NOP", 0),
-  data[10]  = ConvertSAPLine("NOP", 0),
-  data[11]  = ConvertSAPLine("NOP", 0),
-  data[12]  = ConvertSAPLine("NOP", 0),
-  data[13] = ConvertSAPLine("NOP", 5),
-  data[14] = ConvertSAPLine("NOP", 10),
-  data[15] = ConvertSAPLine("NOP", 6),
+  data[0] = ConvertSAPLine(   "LDA", 15 ),
+  data[1] = ConvertSAPLine(   "ADD", 14 ),
+  data[2] = ConvertSAPLine(   "SUB", 13 ),
+  data[3] = ConvertSAPLine(   "OUT", 0  ),
+  data[4] = ConvertSAPLine(   "HLT", 0  ),
+  data[5]  = ConvertSAPLine(  "NOP", 0  ),
+  data[6]  = ConvertSAPLine(  "NOP", 0  ),
+  data[7]  = ConvertSAPLine(  "NOP", 0  ),
+  data[8]  = ConvertSAPLine(  "NOP", 0  ),
+  data[9]  = ConvertSAPLine(  "NOP", 0  ),
+  data[10]  = ConvertSAPLine( "NOP", 0  ),
+  data[11]  = ConvertSAPLine( "NOP", 0  ),
+  data[12]  = ConvertSAPLine( "NOP", 0  ),
+  data[13] = ConvertSAPLine(  "NOP", 5  ),
+  data[14] = ConvertSAPLine(  "NOP", 10 ),
+  data[15] = ConvertSAPLine(  "NOP", 6  ),
 };
 
 //---------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ void setup() {
   pinMode(WRITE_EN, OUTPUT);
   Serial.begin(57600);
 
-  for (int command = 0; command < 15; command += 1) {
+  for (int command = 0; command <= 15; command += 1) {
       setLine(data[command]); //set the RAM data/instruction
       
       //set the RAM address using arduino pins from 9 (LSB) to 12 (MSB)
@@ -105,9 +105,6 @@ void setup() {
       for (int pin = 9; pin <= 12; pin += 1) {
         digitalWrite(pin, tempCommand & 1); //MAYBE WE NEED TO CONVERT INT INTO BYTE
       tempCommand = tempCommand >> 1;
-
-      //to click the write button of the RAM
-      digitalWrite(WRITE_EN, LOW);
 
       //to click the write button of the RAM
       digitalWrite(WRITE_EN, LOW);
