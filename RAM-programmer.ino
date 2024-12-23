@@ -5,6 +5,8 @@
 
 //---------------------------------------------------------------------------------------------
 
+// Global variable to take track if the instruction need to be write
+
 // Struct useful for the dictionary
 struct KeyValue {
   const char* key; // Mnemonic instruction
@@ -20,10 +22,11 @@ KeyValue dictionary[16] = {
   {"STA", 0b0100},
   {"LDI", 0b0101},
   {"JMP", 0b0110},
-  {"JC",  0b0111},
-  {"JZ",  0b1000},
+  {"JC" , 0b0111},
+  {"JZ" , 0b1000},
   {"OUT", 0b1110},
-  {"HLT", 0b1111}
+  {"HLT", 0b1111},
+  {""   , 0b1111} // Added to enable the possibility to insert number up to 255
 };
 
 // Function to find the value corresponding to a mnemonic in the dictionary
@@ -39,23 +42,10 @@ byte getValueForKey(const char* key) {
 // Function to combine the instruction's 4 bits with the operand's 4 bits
 // or directly take an 8-bit integer input
 byte ConvertSAPLine(const char *Instr = nullptr, int Value = 0) {
-  if (Instr != nullptr) {
-    byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
-    return result; // Return the 8-bit binary value
-  } 
-  else {
-    byte result = Value & 0b11111111;
-    return result;
-  }
-  return 0; // Default return value
-}
-/*
-// Function to combine the instruction's 4 bits with the operand's 4 bits
-byte ConvertSAPLine(const char *Instr, int Value) {
   byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
   return result; // Return the 8-bit binary value
+  return 0; // Default return value
 }
-*/
 
 //---------------------------------------------------------------------------------------------
 
@@ -67,7 +57,7 @@ byte data[16] = {
   data[3] = ConvertSAPLine(   "OUT", 0  ), // Output the result
   data[4] = ConvertSAPLine(   "HLT", 0  ), // Halt the program
   data[5]  = ConvertSAPLine(  "NOP", 0  ), // No operation (remaining instructions are NOPs)
-  data[6]  = ConvertSAPLine(   255 ),
+  data[6]  = ConvertSAPLine(   ""  , 255 ),
   data[7]  = ConvertSAPLine(  "NOP", 0  ),
   data[8]  = ConvertSAPLine(  "NOP", 0  ),
   data[9]  = ConvertSAPLine(  "NOP", 0  ),
@@ -113,9 +103,9 @@ void setup() {
 
     // Simulate pressing the write button on the RAM
     digitalWrite(WRITE_EN, LOW);
-    delay(100); // Wait for 1 second
+    delay(250); // Wait for 0.25 second
     digitalWrite(WRITE_EN, HIGH);
-    delay(1000); // Wait for 2 seconds
+    delay(1000); // Wait for 1 second
   }
 
   // Set everything to 0 at the end of the cycle
