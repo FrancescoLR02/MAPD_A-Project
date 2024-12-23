@@ -128,7 +128,9 @@
     [ "vcc3:VCC", "sr1:VCC", "red", [ "h-57.6", "v114" ] ],
     [ "led8:A", "nano:11", "green", [ "v86.4", "h48" ] ],
     [ "led9:A", "nano:10", "green", [ "v76.8", "h28.8" ] ],
-    [ "led10:A", "nano:9", "green", [ "v57.6", "h9.6" ] ]
+    [ "led10:A", "nano:9", "green", [ "v57.6", "h9.6" ] ],
+    [ "led12:C", "gnd5:GND", "black", [ "v0" ] ],
+    [ "led11:C", "gnd5:GND", "black", [ "v0" ] ]
   ],
   "dependencies": {}
 }
