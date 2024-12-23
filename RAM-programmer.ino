@@ -27,6 +27,7 @@ KeyValue dictionary[16] = {
 };
 
 // Function to find the value corresponding to a mnemonic in the dictionary
+/*
 byte getValueForKey(const char* key) {
   for (int i = 0; i < 16; i++) {
     if (strcmp(dictionary[i].key, key) == 0) {
@@ -35,6 +36,19 @@ byte getValueForKey(const char* key) {
   }
   return 0; // Default return value if key is not found
 }
+*/
+// Function to combine the instruction's 4 bits with the operand's 4 bits
+// or directly take an 8-bit integer input
+byte ConvertSAPLine(const char *Instr = nullptr, int Value = -1) {
+  if (Instr != nullptr && Value != -1) {
+    byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
+    return result; // Return the 8-bit binary value
+  } else if (Value >= 0 && Value <= 255) {
+    return static_cast<byte>(Value); // Return the byte directly if within range
+  }
+  return 0; // Default return value
+}
+
 
 // Function to combine the instruction's 4 bits with the operand's 4 bits
 byte ConvertSAPLine(const char *Instr, int Value) {
