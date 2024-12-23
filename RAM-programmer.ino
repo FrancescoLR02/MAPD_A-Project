@@ -6,7 +6,7 @@
 //---------------------------------------------------------------------------------------------
 
 // Global variable to track if it is needed to write the RAM address
-bool RAMwrite = True
+bool RAMwrite = True;
 
 // Struct useful for the dictionary
 struct KeyValue {
@@ -43,16 +43,20 @@ byte getValueForKey(const char* key) {
 byte ConvertSAPLine(const char *Instr = "", int Value = -1) {
   if (Instr != "" && Value != -1) {
       byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
+      RAMwrite = True;
       return result; // Return the 8-bit binary value
   } else {
       if (Value >= 0 && Value <= 255) {
         byte result = Value & 0b11111111;
+        RAMwrite = True;
         return result; // Return the byte directly if within range
       }
       else {
+        RAMwrite = False;
         return 0; // Default return value
       }
   }
+  RAMwrite = False;
   return 0; // Default return value
 }
 
