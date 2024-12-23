@@ -111,10 +111,17 @@ void setup() {
 
     // Simulate pressing the write button on the RAM
     digitalWrite(WRITE_EN, LOW);
-    delay(1000); // Wait for 1 second
+    delay(100); // Wait for 1 second
     digitalWrite(WRITE_EN, HIGH);
-    delay(2000); // Wait for 2 seconds
+    delay(500); // Wait for 2 seconds
   }
+
+  // Set everything to 0 at the end of the cycle
+  setLine(0);
+  for (int pin = 9; pin <= 12; pin++) {
+      digitalWrite(pin,LOW);
+    }
+
 }
 
 //---------------------------------------------------------------------------------------------
