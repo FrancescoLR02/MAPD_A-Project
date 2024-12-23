@@ -38,12 +38,14 @@ byte getValueForKey(const char* key) {
 
 // Function to combine the instruction's 4 bits with the operand's 4 bits
 // or directly take an 8-bit integer input
-byte ConvertSAPLine(const char *Instr = nullptr, int Value = -1) {
-  if (Instr != nullptr && Value != -1) {
+byte ConvertSAPLine(const char *Instr = nullptr, int Value) {
+  if (Instr != nullptr) {
     byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
     return result; // Return the 8-bit binary value
-  } else if (Value >= 0 && Value <= 255) {
-    return static_cast<byte>(Value); // Return the byte directly if within range
+  } 
+  else {
+    byte result = Value & 0b11111111
+    return result;
   }
   return 0; // Default return value
 }
@@ -65,7 +67,7 @@ byte data[16] = {
   data[3] = ConvertSAPLine(   "OUT", 0  ), // Output the result
   data[4] = ConvertSAPLine(   "HLT", 0  ), // Halt the program
   data[5]  = ConvertSAPLine(  "NOP", 0  ), // No operation (remaining instructions are NOPs)
-  data[6]  = ConvertSAPLine(  "NOP", 0  ),
+  data[6]  = ConvertSAPLine(   255 ),
   data[7]  = ConvertSAPLine(  "NOP", 0  ),
   data[8]  = ConvertSAPLine(  "NOP", 0  ),
   data[9]  = ConvertSAPLine(  "NOP", 0  ),
@@ -113,7 +115,7 @@ void setup() {
     digitalWrite(WRITE_EN, LOW);
     delay(100); // Wait for 1 second
     digitalWrite(WRITE_EN, HIGH);
-    delay(500); // Wait for 2 seconds
+    delay(1000); // Wait for 2 seconds
   }
 
   // Set everything to 0 at the end of the cycle
