@@ -1,23 +1,17 @@
- 
-#define SHIFT_DATA 2 //serial data
-#define SHIFT_CLK 3 //è il clock interno dello shift register
-#define SHIFT_LATCH 4 //questo è quello che manda tutti dati contemporanenamente allo store register
-#define WRITE_EN 13 //questo sarà l'equivalente di schiacciare il tasto write
+#define SHIFT_DATA 2 // Serial data pin
+#define SHIFT_CLK 3  // Clock pin for the shift register
+#define SHIFT_LATCH 4 // Latch pin to send data simultaneously to the storage register
+#define WRITE_EN 13  // Simulates pressing the write button
 
 //---------------------------------------------------------------------------------------------
 
-//byte data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-//dafult program with all "NOP 0"
-
-//---------------------------------------------------------------------------------------------
-
-//struct usefull for the following dictionary
+// Struct useful for the dictionary
 struct KeyValue {
-  const char* key;
-  byte value;
+  const char* key; // Mnemonic instruction
+  byte value;      // Corresponding binary value
 };
 
-// Dizionario con 16 voci
+// Dictionary with 16 entries
 KeyValue dictionary[16] = {
   {"NOP", 0b0000},
   {"LDA", 0b0001},
@@ -32,52 +26,49 @@ KeyValue dictionary[16] = {
   {"HLT", 0b1111}
 };
 
-//Questa funzione permette di ricercare il valore nella struttura appena creata, di modo che 
-//quando viene chiamato una qualsiasi istruzione trova il valore corrispondente
+// Function to find the value corresponding to a mnemonic in the dictionary
 byte getValueForKey(const char* key) {
-  // Cerca la chiave nel dizionario
   for (int i = 0; i < 16; i++) {
-    //Verifica se le chiavi sono uguali
     if (strcmp(dictionary[i].key, key) == 0) {
-      //Se lo sono ritorna il valore binario
-      return dictionary[i].value; 
+      return dictionary[i].value; // Return binary value if the key matches
     }
   }
+  return 0; // Default return value if key is not found
 }
 
-//Function to output the byte (8bit) ready to be stored into the RAM (take as input mnemonics + operands)
+// Function to combine the instruction's 4 bits with the operand's 4 bits
 byte ConvertSAPLine(const char *Instr, int Value) {
-  // Combina i 4 bit dell'istruzione con i 4 bit del dato
-  byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111);  // Shift a sinistra di 4 bit + aggiungi i 4 bit del dato
-  return result;  // Ritorna il numero binario a 8 bit
+  byte result = (getValueForKey(Instr) << 4) | (Value & 0b1111); // Combine instruction and operand
+  return result; // Return the 8-bit binary value
 }
 
 //---------------------------------------------------------------------------------------------
-//This program does 6+10-5
+
+// This program performs the calculation 6 + 10 - 5
 byte data[16] = {
-  data[0] = ConvertSAPLine(   "LDA", 15 ),
-  data[1] = ConvertSAPLine(   "ADD", 14 ),
-  data[2] = ConvertSAPLine(   "SUB", 13 ),
-  data[3] = ConvertSAPLine(   "OUT", 0  ),
-  data[4] = ConvertSAPLine(   "HLT", 0  ),
-  data[5]  = ConvertSAPLine(  "NOP", 0  ),
-  data[6]  = ConvertSAPLine(  "NOP", 0  ),
-  data[7]  = ConvertSAPLine(  "NOP", 0  ),
-  data[8]  = ConvertSAPLine(  "NOP", 0  ),
-  data[9]  = ConvertSAPLine(  "NOP", 0  ),
-  data[10]  = ConvertSAPLine( "NOP", 0  ),
-  data[11]  = ConvertSAPLine( "NOP", 0  ),
-  data[12]  = ConvertSAPLine( "NOP", 0  ),
-  data[13] = ConvertSAPLine(  "NOP", 5  ),
-  data[14] = ConvertSAPLine(  "NOP", 10 ),
-  data[15] = ConvertSAPLine(  "NOP", 6  ),
+  ConvertSAPLine("LDA", 15), // Load 6 (stored in RAM address 15)
+  ConvertSAPLine("ADD", 14), // Add 10 (stored in RAM address 14)
+  ConvertSAPLine("SUB", 13), // Subtract 5 (stored in RAM address 13)
+  ConvertSAPLine("OUT", 0),  // Output the result
+  ConvertSAPLine("HLT", 0),  // Halt the program
+  ConvertSAPLine("NOP", 0),  // No operation (remaining instructions are NOPs)
+  ConvertSAPLine("NOP", 0),
+  ConvertSAPLine("NOP", 0),
+  ConvertSAPLine("NOP", 0),
+  ConvertSAPLine("NOP", 0),
+  ConvertSAPLine("NOP", 0),
+  ConvertSAPLine("NOP", 0),
+  ConvertSAPLine("NOP", 0),
+  ConvertSAPLine("NOP", 5),
+  ConvertSAPLine("NOP", 10),
+  ConvertSAPLine("NOP", 6),
 };
 
 //---------------------------------------------------------------------------------------------
 
+// Function to set a line on the shift register
 void setLine(int Line) {
- // shiftOut(SHIFT_DATA, SHIFT_CLK, MSBFIRST, (Line >> 8)); //previuous file version
-  shiftOut(SHIFT_DATA, SHIFT_CLK, MSBFIRST, Line);
+  shiftOut(SHIFT_DATA, SHIFT_CLK, MSBFIRST, Line); // Output the data
   digitalWrite(SHIFT_LATCH, LOW);
   digitalWrite(SHIFT_LATCH, HIGH);
   digitalWrite(SHIFT_LATCH, LOW);
@@ -86,38 +77,35 @@ void setLine(int Line) {
 //---------------------------------------------------------------------------------------------
 
 void setup() {
-//Serial.begin(57600);
-//Serial.print(ConvertSAPLine("LDA", 15), BIN);
   pinMode(SHIFT_DATA, OUTPUT);
   pinMode(SHIFT_CLK, OUTPUT);
   pinMode(SHIFT_LATCH, OUTPUT);
-  digitalWrite(WRITE_EN, HIGH); //all'inizio meglio mettere a HIGH il pulsante che schiacciamo per scrivere nella RAM, se guardi nel datasheet dovrebbe funzionare che scrivi quando lo metti a low (perchè è un active low, di quelli negati in partenza)
   pinMode(WRITE_EN, OUTPUT);
+
+  digitalWrite(WRITE_EN, HIGH); // Set write button to HIGH initially (active low)
   Serial.begin(57600);
 
-  for (int command = 0; command <= 15; command += 1) {
-      setLine(data[command]); //set the RAM data/instruction
-      
-      int tempCommand = command;
-      //set the RAM address using arduino pins from 9 (LSB) to 12 (MSB)
+  for (int command = 0; command <= 15; command++) {
+    setLine(data[command]); // Set the RAM data/instruction
 
-      int tempCommand = command;
+    int tempCommand = command;
 
-      for (int pin = 9; pin <= 12; pin += 1) {
-        digitalWrite(pin, tempCommand & 1); //MAYBE WE NEED TO CONVERT INT INTO BYTE
+    // Set the RAM address using Arduino pins from 9 (LSB) to 12 (MSB)
+    for (int pin = 9; pin <= 12; pin++) {
+      digitalWrite(pin, tempCommand & 1); // Write each bit of the address
       tempCommand = tempCommand >> 1;
-      }
+    }
 
-
-      //to click the write button of the RAM
-      digitalWrite(WRITE_EN, LOW);
-      delay(1000); //500 milliseconds, to click on 'write' of RAM
-      digitalWrite(WRITE_EN, HIGH);
-      delay(2000); //2 seconds to wait for next instructions
+    // Simulate pressing the write button on the RAM
+    digitalWrite(WRITE_EN, LOW);
+    delay(1000); // Wait for 1 second
+    digitalWrite(WRITE_EN, HIGH);
+    delay(2000); // Wait for 2 seconds
   }
 }
 
 //---------------------------------------------------------------------------------------------
 
 void loop() {
+  // No operation in the loop
 }
