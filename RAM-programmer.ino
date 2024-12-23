@@ -59,22 +59,22 @@ byte ConvertSAPLine(const char *Instr, int Value) {
 
 // This program performs the calculation 6 + 10 - 5
 byte data[16] = {
-  ConvertSAPLine("LDA", 15), // Load 6 (stored in RAM address 15)
-  ConvertSAPLine("ADD", 14), // Add 10 (stored in RAM address 14)
-  ConvertSAPLine("SUB", 13), // Subtract 5 (stored in RAM address 13)
-  ConvertSAPLine("OUT", 0),  // Output the result
-  ConvertSAPLine("HLT", 0),  // Halt the program
-  ConvertSAPLine("NOP", 0),  // No operation (remaining instructions are NOPs)
-  ConvertSAPLine("NOP", 0),
-  ConvertSAPLine("NOP", 0),
-  ConvertSAPLine("NOP", 0),
-  ConvertSAPLine("NOP", 0),
-  ConvertSAPLine("NOP", 0),
-  ConvertSAPLine("NOP", 0),
-  ConvertSAPLine("NOP", 0),
-  ConvertSAPLine("NOP", 5),
-  ConvertSAPLine("NOP", 10),
-  ConvertSAPLine("NOP", 6),
+  data[0] = ConvertSAPLine(   "LDA", 15 ), // Load 6 (stored in RAM address 15)
+  data[1] = ConvertSAPLine(   "ADD", 14 ), // Add 10 (stored in RAM address 14)
+  data[2] = ConvertSAPLine(   "SUB", 13 ), // Subtract 5 (stored in RAM address 13)
+  data[3] = ConvertSAPLine(   "OUT", 0  ), // Output the result
+  data[4] = ConvertSAPLine(   "HLT", 0  ), // Halt the program
+  data[5]  = ConvertSAPLine(  "NOP", 0  ), // No operation (remaining instructions are NOPs)
+  data[6]  = ConvertSAPLine(  "NOP", 0  ),
+  data[7]  = ConvertSAPLine(  "NOP", 0  ),
+  data[8]  = ConvertSAPLine(  "NOP", 0  ),
+  data[9]  = ConvertSAPLine(  "NOP", 0  ),
+  data[10]  = ConvertSAPLine( "NOP", 0  ),
+  data[11]  = ConvertSAPLine( "NOP", 0  ),
+  data[12]  = ConvertSAPLine( "NOP", 0  ),
+  data[13] = ConvertSAPLine(  "NOP", 5  ),
+  data[14] = ConvertSAPLine(  "NOP", 10 ),
+  data[15] = ConvertSAPLine(  "NOP", 6  ),
 };
 
 //---------------------------------------------------------------------------------------------
