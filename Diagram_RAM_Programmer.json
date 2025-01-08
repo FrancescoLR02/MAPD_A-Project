@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "author": "Maverick",
+  "author": "Marco Boscolo e Francesco La Rovere",
   "editor": "wokwi",
   "parts": [
     { "type": "wokwi-arduino-nano", "id": "nano", "top": -14.4, "left": 76.3, "attrs": {} },
