@@ -2,6 +2,7 @@
 #define SHIFT_CLK 3  // Clock pin for the shift register
 #define SHIFT_LATCH 4 // Latch pin to send data simultaneously to the storage register
 #define WRITE_EN 13  // Simulates pressing the write button
+
 //---------------------------------------------------------------------------------------------
 
 // Global variable to be written inside an array which will have 
@@ -86,8 +87,9 @@ byte ConvertSAPLine(const char *Instr = "", int Value = -1) {
 
 byte data[16];
 
+
 // This program performs the calculation 6+5-7
-void SumAndSub() {
+void initializeSAPProgram() {
   data[0]  = ConvertSAPLine("LDA", 15);    writeFlags[0]  = RAMwrite;
   data[1]  = ConvertSAPLine("ADD", 14);    writeFlags[1]  = RAMwrite;
   data[2]  = ConvertSAPLine("SUB", 13);    writeFlags[2]  = RAMwrite;
@@ -107,10 +109,8 @@ void SumAndSub() {
   return;
 }
 
-//This program counts from o to 255 with steps of 1
-//and then it decrements from 255 to 0, and it restarts the loop again
-//(essentialy tests carry flag and zero flag)
-void Counting() {
+//This program counts from o to 255 with steps of 1 and then starting again from 0
+void SecondProgram() {
   data[0]  = ConvertSAPLine("OUT", 0);      writeFlags[0]  = RAMwrite;
   data[1]  = ConvertSAPLine("ADD", 15);     writeFlags[1]  = RAMwrite;
   data[2]  = ConvertSAPLine("JC", 4);       writeFlags[2]  = RAMwrite;
@@ -130,7 +130,10 @@ void Counting() {
   return;
 }
 
+
+
 //---------------------------------------------------------------------------------------------
+
 
 // Function to set a line on the shift register
 void setLine(int Line) {
@@ -147,53 +150,62 @@ void setup() {
   pinMode(SHIFT_DATA, OUTPUT);
   pinMode(SHIFT_CLK, OUTPUT);
   pinMode(SHIFT_LATCH, OUTPUT);
+
   //This pin is the writing enable pin setted as output
   pinMode(WRITE_EN, OUTPUT);
+
   //This pins are the one for the address line (4 bits address line)
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(12, OUTPUT);
 
-  //The write enable is setted initially on LOW for semplicity:
-  //it is not controlled by the program, since it is not welded to the board (write enable activated by hand) 
+
+  //The write enable is setted initially on LOW for semplicity: it is not controlled by the program, since it is not welded to the board (write enable activated by hand) 
   digitalWrite(WRITE_EN, LOW); 
-  //digitalWrite(WRITE_EN, HIGH); //in case of welded write on the PCB, the 'write' works as an active low on the PCB  
   //Serial.begin(57600);
 
+
   //Two programs implemented
-  SumAndSub();
-  //Counting();
+
+  initializeSAPProgram();
+  //SecondProgram();
+
+
 
   for (int command = 0; command <= 15; command++) {
     if (writeFlags[command]) { // Only write if the flag is true
+      
       int tempCommand = command;
+
       // Set the RAM address using Arduino pins from 9 (LSB) to 12 (MSB)
       for (int pin = 9; pin <= 12; pin++) {
         digitalWrite(pin, tempCommand & 1); // Write each bit of the address
         tempCommand = tempCommand >> 1;
       }
 
-      delay(100); // Wait for 0.1 second
+      delay(500); // Wait for 0.5 second
+
       setLine(data[command]); // Set the RAM data/instruction
+
       // Simulate pressing the write button on the RAM
       delay(700); // Wait for 0.7 second
+
       //When the write enable is HIGH we can press physically the button on the board to write the instruction in the RAM 
-      //(if the cable was welded into the board we would have inverted the setting for the write enable:
-      //First HIGH, then LOW and finally again LOW)
-      digitalWrite(WRITE_EN, HIGH); // By hand
-      //digitalWrite(WRITE_EN, LOW); // Write welded on the pcb
+      //(if the cable was welded into the board we would have inverted the setting for the write enable: First HIGH, then LOW and finally again LOW)
+      digitalWrite(WRITE_EN, HIGH);
       delay(500); // Wait for 0.5 second
-      digitalWrite(WRITE_EN, LOW); //By hand
-      //digitalWrite(WRITE_EN, HIGH); // Write welded on the pcb
+      digitalWrite(WRITE_EN, LOW);
       delay(700); // Wait for 0.7 second
     }
   }
+
   // Set everything to 0 at the end of the cycle
   setLine(0);
   for (int pin = 9; pin <= 12; pin++) {
       digitalWrite(pin,LOW);
     }
+
 }
 
 //---------------------------------------------------------------------------------------------
