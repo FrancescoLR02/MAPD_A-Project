@@ -87,25 +87,73 @@ byte ConvertSAPLine(const char *Instr = "", int Value = -1) {
 byte data[16];
 
 // This program performs the calculation 6 + 10 - 5
+
 void initializeSAPProgram() {
   data[0]  = ConvertSAPLine("LDA", 15);    writeFlags[0]  = RAMwrite;
   data[1]  = ConvertSAPLine("ADD", 14);    writeFlags[1]  = RAMwrite;
   data[2]  = ConvertSAPLine("SUB", 13);    writeFlags[2]  = RAMwrite;
   data[3]  = ConvertSAPLine("OUT", 0);     writeFlags[3]  = RAMwrite;
   data[4]  = ConvertSAPLine("HLT", 0);     writeFlags[4]  = RAMwrite;
-  data[5]  = ConvertSAPLine("NOP", 0);     writeFlags[5]  = RAMwrite;
-  data[6]  = ConvertSAPLine("", 255);      writeFlags[6]  = RAMwrite;
+  data[5]  = ConvertSAPLine("", -1);        writeFlags[5]  = RAMwrite;
+  data[6]  = ConvertSAPLine("", -1);        writeFlags[6]  = RAMwrite;
   data[7]  = ConvertSAPLine("", -1);       writeFlags[7]  = RAMwrite;
   data[8]  = ConvertSAPLine("", -1);       writeFlags[8]  = RAMwrite;
   data[9]  = ConvertSAPLine("", -1);       writeFlags[9]  = RAMwrite;
   data[10] = ConvertSAPLine("", -1);       writeFlags[10] = RAMwrite;
   data[11] = ConvertSAPLine("", -1);       writeFlags[11] = RAMwrite;
   data[12] = ConvertSAPLine("", -1);       writeFlags[12] = RAMwrite;
-  data[13] = ConvertSAPLine("", 5);        writeFlags[13] = RAMwrite;
-  data[14] = ConvertSAPLine("", 10);       writeFlags[14] = RAMwrite;
-  data[15] = ConvertSAPLine("", 6);        writeFlags[15] = RAMwrite;
+  data[13] = ConvertSAPLine("", 7);        writeFlags[13] = RAMwrite;
+  data[14] = ConvertSAPLine("", 6);       writeFlags[14] = RAMwrite;
+  data[15] = ConvertSAPLine("", 5);        writeFlags[15] = RAMwrite;
   return;
 }
+
+//This program does something else
+
+void SecondProgram() {
+  data[0]  = ConvertSAPLine("OUT", 0);      writeFlags[0]  = RAMwrite;
+  data[1]  = ConvertSAPLine("ADD", 15);     writeFlags[1]  = RAMwrite;
+  data[2]  = ConvertSAPLine("JC", 4);       writeFlags[2]  = RAMwrite;
+  data[3]  = ConvertSAPLine("JMP", 0);      writeFlags[3]  = RAMwrite;
+  data[4]  = ConvertSAPLine("SUB", 15);     writeFlags[4]  = RAMwrite;
+  data[5]  = ConvertSAPLine("OUT", 0);      writeFlags[5]  = RAMwrite;
+  data[6]  = ConvertSAPLine("JZ", 0);       writeFlags[6]  = RAMwrite;
+  data[7]  = ConvertSAPLine("JMP", 4);      writeFlags[7]  = RAMwrite;
+  data[8]  = ConvertSAPLine("", -1);        writeFlags[8]  = RAMwrite;
+  data[9]  = ConvertSAPLine("", -1);        writeFlags[9]  = RAMwrite;
+  data[10] = ConvertSAPLine("", -1);        writeFlags[10] = RAMwrite;
+  data[11] = ConvertSAPLine("", -1);        writeFlags[11] = RAMwrite;
+  data[12] = ConvertSAPLine("", -1);        writeFlags[12] = RAMwrite;
+  data[13] = ConvertSAPLine("", -1);        writeFlags[13] = RAMwrite;
+  data[14] = ConvertSAPLine("", -1);        writeFlags[14] = RAMwrite;
+  data[15] = ConvertSAPLine("", 2);        writeFlags[15] = RAMwrite;
+  return;
+}
+
+
+void ThirdProgram() {
+  data[0]  = ConvertSAPLine("LDA", 14);       writeFlags[0]  = RAMwrite;
+  data[1]  = ConvertSAPLine("SUB", 12);       writeFlags[1]  = RAMwrite;
+  data[2]  = ConvertSAPLine("JC", 6);         writeFlags[2]  = RAMwrite;
+  data[3]  = ConvertSAPLine("LDA", 13);       writeFlags[3]  = RAMwrite;
+  data[4]  = ConvertSAPLine("OUT", 0);        writeFlags[4]  = RAMwrite;
+  data[5]  = ConvertSAPLine("HLT", 0);        writeFlags[5]  = RAMwrite;
+  data[6]  = ConvertSAPLine("STA", 14);       writeFlags[6]  = RAMwrite;
+  data[7]  = ConvertSAPLine("LAD", 13);       writeFlags[7]  = RAMwrite;
+  data[8]  = ConvertSAPLine("ADD", 15);       writeFlags[8]  = RAMwrite;
+  data[9]  = ConvertSAPLine("STA", 13);       writeFlags[9]  = RAMwrite;
+  data[10] = ConvertSAPLine("JMP", 0);        writeFlags[10] = RAMwrite;
+  data[11] = ConvertSAPLine("", -1);          writeFlags[11] = RAMwrite;
+  data[12] = ConvertSAPLine("", 1);           writeFlags[12] = RAMwrite;
+  data[13] = ConvertSAPLine("", 0);          writeFlags[13] = RAMwrite;
+  data[14] = ConvertSAPLine("", 2);          writeFlags[14] = RAMwrite;
+  data[15] = ConvertSAPLine("", 3);          writeFlags[15] = RAMwrite;
+  return;
+}
+
+
+
+
 
 //---------------------------------------------------------------------------------------------
 
@@ -125,14 +173,26 @@ void setup() {
   pinMode(SHIFT_LATCH, OUTPUT);
   pinMode(WRITE_EN, OUTPUT);
 
-  digitalWrite(WRITE_EN, HIGH); // Set write button to HIGH initially (active low)
+  digitalWrite(WRITE_EN, LOW); // Set write button to HIGH initially (active low)
   //Serial.begin(57600);
 
-  initializeSAPProgram();
+  //initializeSAPProgram();
+  SecondProgram();
+  //ThirdProgram();
+
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+
+
+
+
+
 
   for (int command = 0; command <= 15; command++) {
     if (writeFlags[command]) { // Only write if the flag is true
-      setLine(data[command]); // Set the RAM data/instruction
+      
 
       int tempCommand = command;
 
@@ -142,12 +202,16 @@ void setup() {
         tempCommand = tempCommand >> 1;
       }
 
+      delay(500); // Wait for 0.5 second
+
+      setLine(data[command]); // Set the RAM data/instruction
+
       // Simulate pressing the write button on the RAM
-      delay(500); // Wait for 0.5 second
-      digitalWrite(WRITE_EN, LOW);
-      delay(250); // Wait for 0.25 second
+      delay(700); // Wait for 0.5 second
       digitalWrite(WRITE_EN, HIGH);
-      delay(500); // Wait for 0.5 second
+      delay(500); // Wait for 0.25 second
+      digitalWrite(WRITE_EN, LOW);
+      delay(700); // Wait for 0.5 second
     }
   }
 
@@ -163,4 +227,4 @@ void setup() {
 
 void loop() {
   // No operation in the loop
-}
+}\
