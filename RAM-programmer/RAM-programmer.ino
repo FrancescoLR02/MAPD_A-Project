@@ -30,6 +30,7 @@ KeyValue dictionary[16] = {
   {"OUT", 0b1110},
   {"HLT", 0b1111}};
 
+//This function is needed in order to map the binary number into the instruction and viceversa
 // Function to find the value corresponding to a mnemonic in the dictionary
 byte getValueForKey(const char* key) {
   for (int i = 0; i < 16; i++) {
@@ -86,16 +87,16 @@ byte ConvertSAPLine(const char *Instr = "", int Value = -1) {
 
 byte data[16];
 
-// This program performs the calculation 6 + 10 - 5
 
+// This program performs the calculation 6+5-7
 void initializeSAPProgram() {
   data[0]  = ConvertSAPLine("LDA", 15);    writeFlags[0]  = RAMwrite;
   data[1]  = ConvertSAPLine("ADD", 14);    writeFlags[1]  = RAMwrite;
   data[2]  = ConvertSAPLine("SUB", 13);    writeFlags[2]  = RAMwrite;
   data[3]  = ConvertSAPLine("OUT", 0);     writeFlags[3]  = RAMwrite;
   data[4]  = ConvertSAPLine("HLT", 0);     writeFlags[4]  = RAMwrite;
-  data[5]  = ConvertSAPLine("", -1);        writeFlags[5]  = RAMwrite;
-  data[6]  = ConvertSAPLine("", -1);        writeFlags[6]  = RAMwrite;
+  data[5]  = ConvertSAPLine("", -1);       writeFlags[5]  = RAMwrite;
+  data[6]  = ConvertSAPLine("", -1);       writeFlags[6]  = RAMwrite;
   data[7]  = ConvertSAPLine("", -1);       writeFlags[7]  = RAMwrite;
   data[8]  = ConvertSAPLine("", -1);       writeFlags[8]  = RAMwrite;
   data[9]  = ConvertSAPLine("", -1);       writeFlags[9]  = RAMwrite;
@@ -103,13 +104,12 @@ void initializeSAPProgram() {
   data[11] = ConvertSAPLine("", -1);       writeFlags[11] = RAMwrite;
   data[12] = ConvertSAPLine("", -1);       writeFlags[12] = RAMwrite;
   data[13] = ConvertSAPLine("", 7);        writeFlags[13] = RAMwrite;
-  data[14] = ConvertSAPLine("", 6);       writeFlags[14] = RAMwrite;
+  data[14] = ConvertSAPLine("", 6);        writeFlags[14] = RAMwrite;
   data[15] = ConvertSAPLine("", 5);        writeFlags[15] = RAMwrite;
   return;
 }
 
-//This program does something else
-
+//This program counts from o to 255 with steps of 1 and then starting again from 0
 void SecondProgram() {
   data[0]  = ConvertSAPLine("OUT", 0);      writeFlags[0]  = RAMwrite;
   data[1]  = ConvertSAPLine("ADD", 15);     writeFlags[1]  = RAMwrite;
@@ -126,36 +126,14 @@ void SecondProgram() {
   data[12] = ConvertSAPLine("", -1);        writeFlags[12] = RAMwrite;
   data[13] = ConvertSAPLine("", -1);        writeFlags[13] = RAMwrite;
   data[14] = ConvertSAPLine("", -1);        writeFlags[14] = RAMwrite;
-  data[15] = ConvertSAPLine("", 2);        writeFlags[15] = RAMwrite;
+  data[15] = ConvertSAPLine("", 1);         writeFlags[15] = RAMwrite;
   return;
 }
-
-
-void ThirdProgram() {
-  data[0]  = ConvertSAPLine("LDA", 14);       writeFlags[0]  = RAMwrite;
-  data[1]  = ConvertSAPLine("SUB", 12);       writeFlags[1]  = RAMwrite;
-  data[2]  = ConvertSAPLine("JC", 6);         writeFlags[2]  = RAMwrite;
-  data[3]  = ConvertSAPLine("LDA", 13);       writeFlags[3]  = RAMwrite;
-  data[4]  = ConvertSAPLine("OUT", 0);        writeFlags[4]  = RAMwrite;
-  data[5]  = ConvertSAPLine("HLT", 0);        writeFlags[5]  = RAMwrite;
-  data[6]  = ConvertSAPLine("STA", 14);       writeFlags[6]  = RAMwrite;
-  data[7]  = ConvertSAPLine("LAD", 13);       writeFlags[7]  = RAMwrite;
-  data[8]  = ConvertSAPLine("ADD", 15);       writeFlags[8]  = RAMwrite;
-  data[9]  = ConvertSAPLine("STA", 13);       writeFlags[9]  = RAMwrite;
-  data[10] = ConvertSAPLine("JMP", 0);        writeFlags[10] = RAMwrite;
-  data[11] = ConvertSAPLine("", -1);          writeFlags[11] = RAMwrite;
-  data[12] = ConvertSAPLine("", 1);           writeFlags[12] = RAMwrite;
-  data[13] = ConvertSAPLine("", 0);          writeFlags[13] = RAMwrite;
-  data[14] = ConvertSAPLine("", 2);          writeFlags[14] = RAMwrite;
-  data[15] = ConvertSAPLine("", 3);          writeFlags[15] = RAMwrite;
-  return;
-}
-
-
 
 
 
 //---------------------------------------------------------------------------------------------
+
 
 // Function to set a line on the shift register
 void setLine(int Line) {
@@ -167,33 +145,37 @@ void setLine(int Line) {
 
 //---------------------------------------------------------------------------------------------
 
+//Setting the pins connected to the board as output pins. The first three are for the shift register
 void setup() {
   pinMode(SHIFT_DATA, OUTPUT);
   pinMode(SHIFT_CLK, OUTPUT);
   pinMode(SHIFT_LATCH, OUTPUT);
+
+  //This pin is the writing enable pin setted as output
   pinMode(WRITE_EN, OUTPUT);
 
-  digitalWrite(WRITE_EN, LOW); // Set write button to HIGH initially (active low)
-  //Serial.begin(57600);
-
-  //initializeSAPProgram();
-  SecondProgram();
-  //ThirdProgram();
-
+  //This pins are the one for the address line (4 bits address line)
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(12, OUTPUT);
 
 
+  //The write enable is setted initially on LOW for semplicity: it is not controlled by the program, since it is not welded to the board (write enable activated by hand) 
+  digitalWrite(WRITE_EN, LOW); 
+  //Serial.begin(57600);
 
+
+  //Two programs implemented
+
+  initializeSAPProgram();
+  //SecondProgram();
 
 
 
   for (int command = 0; command <= 15; command++) {
     if (writeFlags[command]) { // Only write if the flag is true
       
-
       int tempCommand = command;
 
       // Set the RAM address using Arduino pins from 9 (LSB) to 12 (MSB)
@@ -207,11 +189,14 @@ void setup() {
       setLine(data[command]); // Set the RAM data/instruction
 
       // Simulate pressing the write button on the RAM
-      delay(700); // Wait for 0.5 second
+      delay(700); // Wait for 0.7 second
+
+      //When the write enable is HIGH we can press physically the button on the board to write the instruction in the RAM 
+      //(if the cable was welded into the board we would have inverted the setting for the write enable: First HIGH, then LOW and finally again LOW)
       digitalWrite(WRITE_EN, HIGH);
-      delay(500); // Wait for 0.25 second
+      delay(500); // Wait for 0.5 second
       digitalWrite(WRITE_EN, LOW);
-      delay(700); // Wait for 0.5 second
+      delay(700); // Wait for 0.7 second
     }
   }
 
@@ -227,4 +212,4 @@ void setup() {
 
 void loop() {
   // No operation in the loop
-}\
+}
